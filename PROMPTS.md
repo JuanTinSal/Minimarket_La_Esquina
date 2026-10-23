@@ -313,3 +313,222 @@ Crear:
 Si `REGISTRO.md` no existe, indícalo; no inventes un historial de decisiones realizadas.
 
 Al finalizar, presenta una lista breve de verificación de los requisitos cumplidos, las dos correcciones propuestas y cualquier pendiente. No ejecutes tareas de implementación ni generes código PHP o SQL hasta recibir mi autorización.
+
+# FASE 3 — CREACIÓN DE LA BASE DE DATOS
+## Proyecto: Minimarket «La Esquina»
+
+Actúa como desarrollador backend especializado en PHP 8, MySQL/MariaDB y diseño de bases de datos. Estoy desarrollando un examen individual del curso Inteligencia Artificial y Sistemas Expertos.
+
+Debes desarrollar exclusivamente la Fase 3: Base de datos, respetando el caso del minimarket «La Esquina», los documentos de las fases anteriores y los criterios de evaluación proporcionados.
+
+## 1. Revisión previa obligatoria
+
+Antes de generar o modificar archivos, revisa la estructura del proyecto y lee:
+
+- `D0.md`
+- `requirements.md`
+- `design.md`
+- `REGISTRO.md`, si existe.
+- `PROMPTS.md`, si existe.
+- Los archivos existentes dentro de `database/`.
+- `.env.example` y `.gitignore`, si existen.
+
+Verifica que el diseño de las tablas sea coherente con `design.md`.
+
+No sobrescribas archivos sin revisar su contenido. Si detectas contradicciones entre los documentos, indícalas antes de continuar.
+
+Todavía no desarrolles la aplicación PHP, los controladores, los servicios ni las vistas.
+
+## 2. Archivos que debes preparar
+
+Crea o completa los siguientes archivos:
+
+1. `database/schema.sql`
+2. `database/seed.sql`
+3. `.env`
+4. `.env.example`
+5. `.gitignore`
+
+Respeta la estructura del proyecto existente.
+
+## 3. Archivo database/schema.sql
+
+El script debe crear una base de datos llamada `bodega_ventas` con codificación `utf8mb4`.
+
+Debe incluir las tablas `producto` y `venta`, de acuerdo con `design.md`.
+
+### Tabla producto
+
+Debe almacenar:
+
+- `id_producto`: identificador y clave primaria.
+- `codigo`: código único del producto.
+- `nombre`: nombre del producto.
+- `categoria`: categoría del producto.
+- `precio_venta`: precio de venta.
+- `stock_actual`: unidades disponibles.
+- `stock_minimo`: cantidad mínima establecida para generar una alerta de stock bajo.
+
+### Tabla venta
+
+Debe almacenar:
+
+- `id_venta`: identificador y clave primaria.
+- `id_producto`: referencia al producto vendido.
+- `cantidad`: unidades vendidas.
+- `precio_unitario`: precio aplicado al momento de la venta.
+- `total`: importe total de la venta.
+- `fecha_hora`: fecha y hora del registro.
+
+Utiliza tipos de datos apropiados para identificadores, texto, cantidades, precios monetarios y fechas. Para importes monetarios, utiliza `DECIMAL`, evitando errores de precisión propios de los tipos de punto flotante.
+
+### Restricciones obligatorias
+
+Implementa:
+
+- `PRIMARY KEY` en las claves primarias.
+- `FOREIGN KEY` entre `venta` y `producto`.
+- `UNIQUE` para impedir códigos de producto duplicados.
+- `CHECK (precio_venta >= 0)` para el precio del producto.
+- `CHECK (stock_actual >= 0)` para el stock actual.
+- `CHECK (stock_minimo >= 0)` para el stock mínimo.
+- `CHECK (cantidad > 0)` para las unidades vendidas.
+- Restricciones adicionales justificadas si son necesarias y compatibles con el diseño.
+
+Utiliza el motor InnoDB para ambas tablas.
+
+El script debe poder ejecutarse desde phpMyAdmin sin errores. Si ya existe una estructura previa, evita borrar información existente de forma inesperada. Explica cómo recrear la base de datos desde cero cuando sea necesario.
+
+No añadas tablas innecesarias ni funcionalidades ajenas al caso.
+
+## 4. Archivo database/seed.sql
+
+Este archivo debe insertar exactamente los ocho productos obligatorios indicados a continuación.
+
+| Código | Nombre | Categoría | Precio S/ | Stock | Mínimo |
+|---|---|---|---:|---:|---:|
+| P001 | Arroz superior 5 kg | Abarrotes | 22.50 | 20 | 5 |
+| P002 | Azúcar rubia 1 kg | Abarrotes | 4.20 | 30 | 10 |
+| P003 | Aceite vegetal 1 L | Abarrotes | 9.90 | 12 | 4 |
+| P004 | Leche evaporada 400 g | Lácteos | 4.00 | 48 | 12 |
+| P005 | Fideo spaghetti 500 g | Abarrotes | 3.50 | 25 | 8 |
+| P006 | Atún en trozos 170 g | Conservas | 6.50 | 3 | 6 |
+| P007 | Gaseosa 1.5 L | Bebidas | 7.00 | 18 | 6 |
+| P008 | Detergente 1 kg | Limpieza | 11.80 | 2 | 4 |
+
+Reglas para los datos iniciales:
+
+- Conserva exactamente los códigos, nombres, categorías, precios, stocks y mínimos.
+- No insertes ventas de prueba.
+- No agregues productos adicionales.
+- No cambies los datos para facilitar las pruebas.
+- Evita duplicar los productos si el script se ejecuta nuevamente; explica cómo realizar una carga limpia cuando sea necesario.
+
+Los productos P006 y P008 deben aparecer inicialmente como productos con stock bajo, porque sus existencias están por debajo de su stock mínimo.
+
+## 5. Archivo .env
+
+Crea un archivo `.env` para la configuración local de conexión a MySQL/MariaDB, con estas variables:
+
+DB_HOST=127.0.0.1
+DB_NAME=bodega_ventas
+DB_USER=root
+DB_PASS=
+
+Utiliza valores locales de ejemplo que correspondan a una instalación típica de XAMPP. Si mi instalación utiliza otras credenciales, explícame dónde modificarlas.
+
+No afirmes que la conexión funciona sin haberla probado.
+
+No incluyas credenciales reales en el repositorio ni en los documentos públicos.
+
+## 6. Archivo .env.example
+
+Crea una plantilla con las mismas variables:
+
+DB_HOST=127.0.0.1
+DB_NAME=bodega_ventas
+DB_USER=root
+DB_PASS=
+
+Este archivo debe poder compartirse en el repositorio porque contiene valores de ejemplo, no secretos reales.
+
+## 7. Archivo .gitignore
+
+Asegúrate de que exista una regla que excluya `.env` del control de versiones.
+
+Como mínimo, incluye:
+
+.env
+
+Puedes conservar las demás reglas existentes si son pertinentes.
+
+No elimines reglas válidas del archivo `.gitignore`.
+
+## 8. Verificación obligatoria en phpMyAdmin
+
+Después de generar los scripts, explícame paso a paso cómo comprobarlos en XAMPP y phpMyAdmin:
+
+1. Iniciar Apache y MySQL desde el panel de XAMPP.
+2. Abrir `http://localhost/phpmyadmin/`.
+3. Seleccionar la pestaña SQL y ejecutar `database/schema.sql`.
+4. Ejecutar `database/seed.sql`.
+5. Comprobar que existen las tablas `producto` y `venta`.
+6. Ejecutar la siguiente consulta:
+
+SELECT COUNT(*) FROM producto;
+
+El resultado debe ser exactamente 8.
+
+7. Comprobar el stock bajo mediante:
+
+SELECT codigo, nombre, stock_actual, stock_minimo
+FROM producto
+WHERE stock_actual <= stock_minimo;
+
+Deben aparecer inicialmente P006 y P008.
+
+8. Verificar que `.env` esté excluido de Git ejecutando:
+
+git check-ignore .env
+
+El resultado esperado debe mostrar `.env`.
+
+Si algún script falla, no inventes que se ejecutó correctamente. Pídeme el mensaje de error completo y corrige únicamente la causa identificada, sin rehacer innecesariamente todo el proyecto.
+
+## 9. Registro de correcciones
+
+Si se produce un error:
+
+- Identifica el archivo y la causa.
+- Explica brevemente la corrección.
+- Registra en `REGISTRO.md` el error real y cómo se solucionó.
+- No inventes errores ni correcciones que no hayan ocurrido.
+
+Actualiza `PROMPTS.md` con el prompt utilizado si ese archivo forma parte del procedimiento del examen.
+
+## 10. Criterios de aceptación de la Fase 3
+
+Antes de declarar la fase terminada, verifica:
+
+- Existe `database/schema.sql`.
+- Existe `database/seed.sql`.
+- La base de datos se llama `bodega_ventas` y utiliza `utf8mb4`.
+- Existen las tablas `producto` y `venta`.
+- Las claves primarias y foráneas están definidas.
+- El código de producto es único.
+- Los CHECK solicitados están implementados.
+- `seed.sql` contiene exactamente los ocho productos indicados.
+- `SELECT COUNT(*) FROM producto` devuelve 8 después de una carga limpia.
+- `.env` contiene las variables requeridas y está excluido de Git.
+- `.env.example` está preparado para compartirse.
+- Los errores y correcciones reales están registrados.
+
+No continúes con la Fase 4 ni desarrolles código PHP.
+
+## 11. Entrega de la fase
+
+Primero, analiza el proyecto y presenta un breve resumen de los archivos que crearás o modificarás.
+
+Después, prepara los archivos y explícame cómo probarlos en phpMyAdmin.
+
+No realices el tercer commit automáticamente. Espera a que yo confirme que la base de datos funciona y que las verificaciones son correctas.
