@@ -532,3 +532,67 @@ Primero, analiza el proyecto y presenta un breve resumen de los archivos que cre
 Después, prepara los archivos y explícame cómo probarlos en phpMyAdmin.
 
 No realices el tercer commit automáticamente. Espera a que yo confirme que la base de datos funciona y que las verificaciones son correctas.
+
+# FASE 4 
+## Prompt P1 · Decisiones y estructura (min 55–60):
+Actúa como desarrollador sénior que trabaja junto a un estudiante de Ingeniería de Sistemas.
+Lee requirements.md, design.md, database/schema.sql y .env.example. No generes código todavía.
+ 
+1. Explícame las decisiones técnicas que vas a tomar y, en cada una, la alternativa que
+   descartaste y por qué: lenguaje (el entorno es XAMPP); organización del código (capas o un
+   solo archivo); acceso a datos (PDO preparado o SQL concatenado); dónde van las credenciales;
+   tipado (strict_types); manejo de errores; idioma de nombres y comentarios.
+2. Propón el árbol de carpetas y archivos. Para cada archivo, una línea: qué hace y qué RF
+   implementa.
+3. Describe el recorrido de una venta, desde que el cajero pulsa «Registrar venta» hasta que
+   el stock queda descontado, nombrando cada archivo por el que pasa.
+Espera a que yo escriba «aprobado» o te indique cambios.
+
+## Prompt P2 · Construcción archivo por archivo (min 60–90):
+Construye el proyecto UN archivo por turno, en este orden:
+.env.example y config/database.php → app/Models → app/Repositories → app/Services
+→ app/Exceptions → app/Controllers → views → public/index.php.
+ 
+Por cada archivo, escríbelo en el proyecto y explica:
+A) QUÉ HACE: qué RF y qué capa de design.md implementa, y qué NO debe hacer este archivo.
+B) EL CÓDIGO completo, con PHPDoc en español en cada clase y método.
+C) VARIABLES Y TIPOS: una tabla con cada propiedad y parámetro, su tipo (int, string, float,
+   ?string, array, PDO…) y por qué ese tipo; indica por qué puede o no ser null.
+D) RIESGOS: qué podría fallar en este archivo y cómo el código lo previene.
+ 
+Reglas para todo el código:
+- declare(strict_types=1); una clase por archivo; namespace App\; estilo PSR-12.
+- PDO con sentencias preparadas siempre; nunca concatenar SQL.
+- Credenciales solo desde .env.
+- La venta y el descuento de stock en UNA transacción (beginTransaction / commit / rollBack).
+- Las reglas de negocio solo en Services; los Repositories solo ejecutan SQL.
+- Distinguir "registro inexistente" (devolver null) de "error de base de datos" (excepción).
+- Salida escapada con htmlspecialchars; token CSRF en cada formulario.
+- Excepciones propias; nunca mostrar trazas al usuario.
+
+## Prompt P3 · Pruebas (min 90–100):
+Antes de escribir código, explícame en pocas líneas por qué se prueba el Service y no la vista,
+y qué es un repositorio falso en memoria.
+Luego genera tests/run.php ejecutable con "php tests/run.php", sin PHPUnit ni Composer, que
+pruebe los Services con repositorios falsos en memoria (sin base de datos). Casos mínimos:
+1) venta válida: calcula el total y descuenta el stock;
+2) cantidad 0 o negativa: se rechaza;
+3) cantidad mayor al stock: se rechaza y el stock no cambia;
+4) producto inexistente: se rechaza;
+5) producto con precio negativo: se rechaza;
+6) listado de stock bajo: devuelve solo productos en o por debajo de su mínimo.
+Al final, explícame cómo leer la salida.
+
+## Fase 5 · Seguridad y cierre (min 100–112)
+## Prompt P4 · Auditoría:
+Audita todo el código contra OWASP Top 10: inyección SQL, XSS, CSRF, credenciales expuestas,
+manejo de errores e integridad de datos (transacción de venta). Por cada hallazgo indica:
+archivo, línea, riesgo, un ejemplo concreto de cómo se explotaría y la corrección.
+Explica cada corrección y aplícala solo cuando yo escriba «aplica».
+
+## Prompt P5 · Deuda técnica y documentación:
+Escribe TECH_DEBT.md con al menos tres atajos tomados hoy (qué, por qué, impacto, cuándo
+pagarlo). Escribe README.md con: requisitos, cómo crear la base con database/schema.sql y
+seed.sql, cómo configurar .env, cómo ejecutar la aplicación y las pruebas.
+Verifica que .env esté en .gitignore y que .env.example exista. Propón el mensaje de commit.
+Complete REGISTRO.md. Commit 5: «docs: auditoría, deuda técnica y README». Confirme en GitHub que .env NO aparece.
